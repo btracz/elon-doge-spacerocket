@@ -11,11 +11,30 @@ const { token } = config.twitter;
 
 import { sendTweetAlert } from "./mailer";
 import { getTweetDetails } from "./twitter";
-import { Rule, RulesResponse } from "./types/twitter-types";
-import { formatTweet } from "./utils";
+import { RulesResponse, Tweet } from "./types/twitter-types";
+import { analyzeTweetTopic } from "./analysis";
 
 const rulesURL = "https://api.twitter.com/2/tweets/search/stream/rules";
 const streamURL = "https://api.twitter.com/2/tweets/search/stream";
+
+const processTweet = async (id: string) => {
+  // find tweet details and parent tweet
+  const tweet = await getTweetDetails(id);
+  if (!tweet) {
+    console.warn("Unknown tweet", id);
+    return;
+  }
+  analyzeTweetTopic(tweet);
+  console.log(
+    dayjs().format,
+    "Elon's tweet details",
+    JSON.stringify(tweet, null, 2)
+  );
+
+  if (tweet) {
+    sendTweetAlert(tweet);
+  }
+};
 
 // this sets up two rules - the value is the search terms to match on, and the tag is an identifier that
 // will be applied to the Tweets return to show which rule they matched
@@ -84,7 +103,7 @@ async function setRules() {
   });
 
   if (response.statusCode !== 201) {
-    throw new Error(response.body);
+    throw new Error(JSON.stringify(response.body));
   }
 
   return response.body;
@@ -105,16 +124,21 @@ function streamConnect(retryAttempt: number) {
         const json = JSON.parse(data);
         console.log(dayjs().format, "Elon's tweet payload", json);
 
-        // find tweet details and parent tweet
-        const tweet = await getTweetDetails(json.data.id);
-        console.log(
-          dayjs().format,
-          "Elon's tweet details",
-          JSON.stringify(tweet, null, 2)
-        );
-
-        if (tweet) {
-          sendTweetAlert(formatTweet(tweet));
+        if (!json.errors) {
+          console.warn(json.errors);
+        } else if (json.data?.id) {
+          try {
+            processTweet(json.data.id);
+          } catch (error) {
+            console.error(
+              "Error while processing",
+              json,
+              "=> details :",
+              error
+            );
+          }
+        } else {
+          console.error("Unprocessable data", json);
         }
 
         // A successful connection resets retry count.
@@ -169,4 +193,11 @@ function streamConnect(retryAttempt: number) {
   console.log("Listening to Elon");
 
   process.on("beforeExit", () => stream.removeAllListeners());
+
+  /** EXAMPLE TWEETS FOR DEBUGGING PURPOSE */
+  /*try {
+    processTweet("1494760936652955649");
+  } catch (error) {
+    console.error("Error while processing, details :", error);
+  }*/
 })();

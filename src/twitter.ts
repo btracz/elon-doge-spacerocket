@@ -12,7 +12,7 @@ export const getTweetDetails = async (id: string) => {
     expansions: ["referenced_tweets.id", "author_id"],
     "user.fields": ["username", "name"],
   });
-  const tweet = { ...data[0], ...includes } as Tweet;
+  const tweet = { ...data?.[0], ...includes } as Tweet;
   if (tweet?.referenced_tweets?.length > 0) {
     const parent = tweet.referenced_tweets.find(
       (t: MinimalTweet) => t.type === TWEET_TYPES.REPLY

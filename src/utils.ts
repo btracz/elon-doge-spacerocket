@@ -15,7 +15,7 @@ export const formatTweet = (tweet: Tweet) => {
     }
   }
 
-  if (currentTweet.quotation) {
+  if (currentTweet?.quotation) {
     linesToPrint.push(
       `<i>${currentTweet.quotation.users[0].name} {@${currentTweet.quotation.users[0].username}} : "${currentTweet.quotation.text}"</i>`
     );

@@ -1,5 +1,6 @@
 node_modules/
 .history/
 .idea/
+build/
 
 conf.json

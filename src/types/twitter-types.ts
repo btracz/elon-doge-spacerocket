@@ -22,6 +22,10 @@ export interface Tweet extends MinimalTweet {
   author_id: string;
   referenced_tweets: MinimalTweet[];
   users: User[];
+  topic?: {
+    value: string;
+    direct: boolean;
+  };
 }
 
 export interface Rule {
