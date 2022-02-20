@@ -124,11 +124,11 @@ function streamConnect(retryAttempt: number) {
         const json = JSON.parse(data);
         console.log(dayjs().format, "Elon's tweet payload", json);
 
-        if (!json.errors) {
+        if (json.errors) {
           console.warn(json.errors);
         } else if (json.data?.id) {
           try {
-            processTweet(json.data.id);
+            await processTweet(json.data.id);
           } catch (error) {
             console.error(
               "Error while processing",
@@ -184,7 +184,7 @@ function streamConnect(retryAttempt: number) {
     // Add rules to the stream. Comment the line below if you don't want to add new rules.
     await setRules();
   } catch (e) {
-    console.error(e);
+    console.error("Error with rule", e);
     process.exit(1);
   }
 
