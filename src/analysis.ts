@@ -10,9 +10,12 @@ export enum TWEET_TOPICS {
   OTHER = "other",
 }
 
+const TWITTER_USERNAME_PATTERN = /@(?=.*\w)[\w]{1,15}/g;
+
 export const TOPIC_PATTERNS = {
   [TWEET_TOPICS.DOGE]: /.*(doge\s|dogecoin).*/gi,
-  [TWEET_TOPICS.CRYPTOS]: /.*(crypto\s|cryptos|bitcoin|ethereum).*/gi,
+  [TWEET_TOPICS.CRYPTOS]:
+    /.*(crypto\s|cryptos|bitcoin|ethereum|btc|eth\s|cryptocurrency|cryptocurrencies).*/gi,
   [TWEET_TOPICS.TESLA]: /.*(tesla|tsla).*/gi,
   [TWEET_TOPICS.STARLINK]: /.*(starlink|star\slink).*/gi,
   [TWEET_TOPICS.SPACE_X]: /.*(spacex|space\sx).*/gi,
@@ -20,6 +23,10 @@ export const TOPIC_PATTERNS = {
 
 export const analyzeTweetTopic = (tweet: Tweet) => {
   const fullConversation = formatTweet(tweet).join(" ");
+  const fullConversationWithoutUsernames = fullConversation.replace(
+    TWITTER_USERNAME_PATTERN,
+    ""
+  );
 
   Object.keys(TWEET_TOPICS).some((key: string) => {
     const topicRegex = (TOPIC_PATTERNS as any)[(TWEET_TOPICS as any)[key]];
@@ -33,7 +40,7 @@ export const analyzeTweetTopic = (tweet: Tweet) => {
         direct: true,
       };
       return true;
-    } else if (topicRegex.test(fullConversation)) {
+    } else if (topicRegex.test(fullConversationWithoutUsernames)) {
       tweet.topic = {
         value: key,
         direct: false,

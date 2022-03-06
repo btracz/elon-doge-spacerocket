@@ -12,7 +12,7 @@ const { token } = config.twitter;
 import { sendTweetAlert } from "./mailer";
 import { getTweetDetails } from "./twitter";
 import { RulesResponse, Tweet } from "./types/twitter-types";
-import { analyzeTweetTopic } from "./analysis";
+import { analyzeTweetTopic, TWEET_TOPICS } from "./analysis";
 
 const rulesURL = "https://api.twitter.com/2/tweets/search/stream/rules";
 const streamURL = "https://api.twitter.com/2/tweets/search/stream";
@@ -32,7 +32,20 @@ const processTweet = async (id: string) => {
   );
 
   if (tweet) {
-    sendTweetAlert(tweet);
+    switch (tweet.topic?.value) {
+      case TWEET_TOPICS.CRYPTOS:
+      case TWEET_TOPICS.DOGE:
+        sendTweetAlert(tweet);
+        break;
+      case undefined:
+        console.log("Elon just tweeted about an unknown topic :", tweet.text);
+        break;
+      default:
+        console.log(
+          `Elon just tweeted about ${tweet.topic?.value}, no need to panic.`
+        );
+        break;
+    }
   }
 };
 
