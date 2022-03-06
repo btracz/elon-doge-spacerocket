@@ -13,7 +13,8 @@ export enum TWEET_TOPICS {
 const TWITTER_USERNAME_PATTERN = /@(?=.*\w)[\w]{1,15}/g;
 
 export const TOPIC_PATTERNS = {
-  [TWEET_TOPICS.DOGE]: /.*(doge\s|dogecoin).*/gi,
+  [TWEET_TOPICS.DOGE]:
+    /.*(doge(\s|\.|$)|dogecoin|Ðoge|ðoge|Ðogecoin|ðogecoin).*/gi,
   [TWEET_TOPICS.CRYPTOS]:
     /.*(crypto\s|cryptos|bitcoin|ethereum|btc|eth\s|cryptocurrency|cryptocurrencies).*/gi,
   [TWEET_TOPICS.TESLA]: /.*(tesla|tsla).*/gi,
