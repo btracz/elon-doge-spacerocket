@@ -1,13 +1,13 @@
 import { Tweet } from "./types/twitter-types";
 import { formatTweet } from "./utils";
 
-export enum TWEET_TOPICS {
-  DOGE = "Dogecoin",
-  CRYPTOS = "Cryptos",
-  TESLA = "Tesla",
-  STARLINK = "Starlink",
-  SPACE_X = "SpaceX",
-  OTHER = "other",
+export const TWEET_TOPICS = {
+  DOGE: "Dogecoin",
+  CRYPTOS: "Cryptos",
+  TESLA: "Tesla",
+  STARLINK: "Starlink",
+  SPACE_X: "SpaceX",
+  OTHER: "other",
 }
 
 const TWITTER_USERNAME_PATTERN = /@(?=.*\w)[\w]{1,15}/g;
@@ -37,13 +37,13 @@ export const analyzeTweetTopic = (tweet: Tweet) => {
 
     if (topicRegex.test(tweet.text)) {
       tweet.topic = {
-        value: key,
+        value: (TWEET_TOPICS as any)[key],
         direct: true,
       };
       return true;
     } else if (topicRegex.test(fullConversationWithoutUsernames)) {
       tweet.topic = {
-        value: key,
+        value: (TWEET_TOPICS as any)[key],
         direct: false,
       };
       return true;
